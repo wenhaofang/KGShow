@@ -9,6 +9,11 @@ const routes = [
     path: '/search',
     name: 'Search',
     component: () => import('@/views/Search.vue')
+  },
+  {
+    path: '/result',
+    name: 'Result',
+    component: () => import('@/views/Result.vue')
   }
 ]
 

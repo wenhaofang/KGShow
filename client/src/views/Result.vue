@@ -1,5 +1,5 @@
 <template>
-  <div class="kg-wrapper">
+  <div class="wrapper">
     <KG
       width="1000px"
       height="400px"
@@ -16,7 +16,7 @@
 import KG from '@/components/KG'
 import { getKGData } from '@/utils/mock'
 export default {
-  name: 'KGWrapper',
+  name: 'Result',
   components: {
     KG
   },
@@ -45,5 +45,13 @@ export default {
 </script>
 
 <style scoped lang="less">
+.wrapper {
+  width: 100%;
+  height: 100%;
 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 </style>
