@@ -1,5 +1,6 @@
 <template>
   <div class="wrapper">
+    <div class="title">知识图谱展示</div>
     <KG
       width="1000px"
       height="400px"
@@ -28,18 +29,25 @@ export default {
     }
   },
   methods: {
-    handleNodeClick: function (nodeID) {
-      console.log(nodeID)
+    handleNodeClick: async function (nodeID) {
+      const node = this.nodes.filter(node => node.id === nodeID)[0]
+      await this.getData(node.name)
     },
-    handleEdgeClick: function (edgeID) {
-      console.log(edgeID)
+    handleEdgeClick: async function (edgeID) {
+      const edge = this.edges.filter(edge => edge.id === edgeID)[0]
+      console.log(edge.relationship)
+    },
+    getData: async function (query) {
+      this.loading = true
+      const data = await getKGData(query)
+      this.nodes = data[0]
+      this.edges = data[1]
+      this.loading = false
     }
   },
-  mounted: function () {
-    const datas = getKGData()
-    this.nodes = datas[0]
-    this.edges = datas[1]
-    this.loading = false
+  mounted: async function () {
+    const name = this.$route.params.query
+    await this.getData(name)
   }
 }
 </script>
@@ -53,5 +61,12 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  .title {
+    font-size: 30px;
+    font-weight: 500;
+    color: #00aaff;
+    margin-bottom: 30px;
+  }
 }
 </style>
