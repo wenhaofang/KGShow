@@ -1,2 +1,7 @@
 # index.py
 flask==1.1.2
+
+# util/crawl.py
+requests==2.25.1
+lxml==4.6.3
+pandas==1.1.5
