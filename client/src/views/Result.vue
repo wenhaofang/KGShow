@@ -15,7 +15,7 @@
 
 <script>
 import KG from '@/components/KG'
-import { getKGData } from '@/utils/mock'
+import { get } from '@/utils/api'
 export default {
   name: 'Result',
   components: {
@@ -29,25 +29,29 @@ export default {
     }
   },
   methods: {
-    handleNodeClick: async function (nodeID) {
+    handleNodeClick: function (nodeID) {
       const node = this.nodes.filter(node => node.id === nodeID)[0]
-      await this.getData(node.name)
+      this.getData(node.name)
     },
-    handleEdgeClick: async function (edgeID) {
+    handleEdgeClick: function (edgeID) {
       const edge = this.edges.filter(edge => edge.id === edgeID)[0]
       console.log(edge.relationship)
     },
-    getData: async function (query) {
+    getData: function (query) {
       this.loading = true
-      const data = await getKGData(query)
-      this.nodes = data[0]
-      this.edges = data[1]
-      this.loading = false
+      get('/graph', {
+        query: query
+      }).then(res => {
+        const data = res.data
+        this.nodes = data[0]
+        this.edges = data[1]
+        this.loading = false
+      })
     }
   },
-  mounted: async function () {
+  mounted: function () {
     const name = this.$route.params.query
-    await this.getData(name)
+    this.getData(name)
   }
 }
 </script>
