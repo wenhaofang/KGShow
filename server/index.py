@@ -4,6 +4,7 @@ import configparser
 
 from flask import Flask
 from flask import request
+from flask import jsonify
 
 from model import graph
 
@@ -36,10 +37,16 @@ def log_info():
         )
     )
 
+@app.after_request
+def cross_origin(response):
+    response.headers['Access-Control-Allow-Origin' ] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'OPTIONS, HEAD, GET, POST'
+    return response
+
 @app.route('/graph', methods = ['GET'], endpoint = 'graph')
 def get_graph():
     query = request.args.get('query')
     nodes, edges = graph.get_triple(query)
-    return json.dumps([nodes, edges])
+    return jsonify([nodes, edges])
 
 app.run(host = host, port = port, debug = True)
