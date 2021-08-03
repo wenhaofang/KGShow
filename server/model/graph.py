@@ -23,11 +23,17 @@ def get_triple(query):
     selectedE = entities_df[
         entities_df['entity'].isin(entities)
     ]
+    selectedR = selectedR.reset_index(drop = True)
+    selectedE = selectedE.reset_index(drop = True)
+    id2name = dict(selectedE.to_dict('split').get('data'))
+    name2id = {name: id for id, name in id2name.items()}
+    selectedR['entity'] = selectedR['entity'].apply(lambda name: name2id[name])
+    selectedR['entityTo'] = selectedR['entityTo'].apply(lambda name: name2id[name])
     selectedE.insert(selectedE.shape[1], 'label', ['person' for _ in range(selectedE.shape[0])])
-    selectedE = selectedE.rename(columns = {'entity': 'name'})
     selectedR = selectedR.rename(columns = {'entity': 'source', 'relation': 'relationship', 'entityTo': 'target'})
-    selectedE = selectedE.to_json(orient = 'records', force_ascii = False)
-    selectedR = selectedR.to_json(orient = 'records', force_ascii = False)
+    selectedE = selectedE.rename(columns = {'entity': 'name'})
+    selectedR = selectedR.to_dict(orient = 'records')
+    selectedE = selectedE.to_dict(orient = 'records')
     return selectedE, selectedR
 
 if __name__ == '__main__':
