@@ -41,6 +41,7 @@ def log_info():
 def cross_origin(response):
     response.headers['Access-Control-Allow-Origin' ] = '*'
     response.headers['Access-Control-Allow-Methods'] = 'OPTIONS, HEAD, GET, POST'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
     return response
 
 @app.route('/graph', methods = ['GET'], endpoint = 'graph')
