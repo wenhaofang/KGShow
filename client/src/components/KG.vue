@@ -15,47 +15,20 @@ export default {
       default: false
     },
     width: {
-      type: String,
-      default: '100%'
+      type: String, // e.g. 1000px
+      require: true
     },
     height: {
-      type: String,
-      default: '100%'
+      type: String, // e.g. 400px
+      require: true
     },
     nodes: {
-      type: Array,
-      require: true,
-      validator: function (array) {
-        function typeOf (value) {
-          return Object.prototype.toString.call(value).slice(8, -1)
-        }
-        return array.every(val => {
-          return (
-            typeOf(val) === 'Object' &&
-            typeOf(val.id) === 'String' &&
-            typeOf(val.name) === 'String' &&
-            typeOf(val.label) === 'String'
-          )
-        })
-      }
+      type: Array, // [{id: String, name: String, label: String}, ...]
+      require: true
     },
     edges: {
-      type: Array,
-      require: true,
-      validator: function (array) {
-        function typeOf (value) {
-          return Object.prototype.toString.call(value).slice(8, -1)
-        }
-        return array.every(val => {
-          return (
-            typeOf(val) === 'Object' &&
-            typeOf(val.id) === 'String' &&
-            typeOf(val.source) === 'String' &&
-            typeOf(val.target) === 'String' &&
-            typeOf(val.relationship) === 'String'
-          )
-        })
-      }
+      type: Array, // [{id: String, source: String, target: String, relationship: String}, ...]
+      require: true
     }
   },
   data: function () {
@@ -97,10 +70,34 @@ export default {
           'font-size': 10,
           'text-opacity': 0.8,
           'curve-style': 'bezier',
-          'control-point-step-size': 10
+          'control-point-step-size': 20
         }
       }
       return [...nodeStyle, edgeStyle]
+    },
+    layout: function () {
+      const nodeNum = this.nodes.length
+      let scale = 1
+      if (nodeNum === 0) {
+        scale = 1
+      } else if (nodeNum <= 5) {
+        scale = 2.5
+      } else if (nodeNum <= 10) {
+        scale = 1.7
+      } else if (nodeNum <= 15) {
+        scale = 1.2
+      } else {
+        scale = 1
+      }
+      return {
+        // reference: https://js.cytoscape.org/#layouts
+        fit: true,
+        name: 'concentric',
+        minNodeSpacing: 30,
+        spacingFactor: scale,
+        animate: true,
+        animationDuration: 1000
+      }
     }
   },
   watch: {
@@ -119,12 +116,16 @@ export default {
   },
   methods: {
     render: function () {
+      const renderX = parseFloat(this.width) / 2
+      const renderY = parseFloat(this.height) / 2
       const cy = cytoscape({
+        pan: { x: renderX, y: renderY },
+        zoom: 1,
+        minZoom: 0.1,
+        maxZoom: 10,
         container: this.el,
         style: this.style,
-        layout: {
-          name: 'random'
-        },
+        layout: this.layout,
         elements: {
           nodes: this.nodes.map(item => ({ data: item })),
           edges: this.edges.map(item => ({ data: item }))
