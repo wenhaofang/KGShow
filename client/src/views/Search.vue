@@ -80,7 +80,7 @@ export default {
 
     .search-box {
       width: 600px;
-      height: 30px;
+      height: 45px;
       padding: 5px;
       min-width: 600px;
       min-height: 30px;
