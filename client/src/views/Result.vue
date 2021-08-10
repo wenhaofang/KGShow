@@ -22,6 +22,7 @@
         :data-source="dataSource"
         :row-selection="{selectedRowKeys: dataSelect, onChange: handleSelect}"
         :rowKey="record => record.index"
+        @change="handleChange"
       >
         <template v-slot:source="{text}"><div v-html="text"></div></template>
         <template v-slot:target="{text}"><div v-html="text"></div></template>
@@ -46,6 +47,8 @@ export default {
       edges: [],
       dataSelect: [],
       dataOrigin: [],
+      sortorInfo: {},
+      filterInfo: {},
       pagination: {
         pageSize: 10,
         showSizeChanger: true,
@@ -70,10 +73,12 @@ export default {
         key: 'source',
         slots: { customRender: 'source' },
         sortDirections: ['ascend', 'descend'],
+        sortOrder: this.sortorInfo && this.sortorInfo.columnKey === 'source' && this.sortorInfo.order,
         sorter: (recordA, recordB) => {
           return recordA.source.localeCompare(recordB.source, 'zh')
         },
         filterMultiple: true,
+        filteredValue: (this.filterInfo && this.filterInfo.source) || null,
         filters: sourceList.map(source => {
           return { text: source, value: source }
         }),
@@ -85,10 +90,12 @@ export default {
         dataIndex: 'relationship',
         key: 'relationship',
         sortDirections: ['ascend', 'descend'],
+        sortOrder: this.sortorInfo && this.sortorInfo.columnKey === 'relationship' && this.sortorInfo.order,
         sorter: (recordA, recordB) => {
           return recordA.relationship.localeCompare(recordB.relationship, 'zh')
         },
         filterMultiple: true,
+        filteredValue: (this.filterInfo && this.filterInfo.relationship) || null,
         filters: relationList.map(relation => {
           return { text: relation, value: relation }
         }),
@@ -101,10 +108,12 @@ export default {
         key: 'target',
         slots: { customRender: 'target' },
         sortDirections: ['ascend', 'descend'],
+        sortOrder: this.sortorInfo && this.sortorInfo.columnKey === 'target' && this.sortorInfo.order,
         sorter: (recordA, recordB) => {
           return recordA.target.localeCompare(recordB.target, 'zh')
         },
         filterMultiple: true,
+        filteredValue: (this.filterInfo && this.filterInfo.target) || null,
         filters: targetList.map(target => {
           return { text: target, value: target }
         }),
@@ -142,6 +151,8 @@ export default {
         const mappingKey = this.nodes.map(node => node.id)
         const mappingVal = this.nodes.map(node => node.name)
         this.dataSelect = [] // clear
+        this.sortorInfo = {} // clear
+        this.filterInfo = {} // clear
         this.dataOrigin = this.edges.map((edge, index) => ({
           index: index + 1,
           source: mappingVal[mappingKey.indexOf(edge.source)],
@@ -153,6 +164,10 @@ export default {
     },
     handleSelect: function (selectedRowKeys) {
       this.dataSelect = selectedRowKeys
+    },
+    handleChange: function (pagination, filter, sorter) {
+      this.filterInfo = filter
+      this.sortorInfo = sorter
     },
     format: function (data) {
       return String(data).replace(/"/g, '""').replace(/(^[\s\S]*$)/, '"$1"')
