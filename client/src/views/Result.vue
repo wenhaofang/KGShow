@@ -20,7 +20,7 @@
         :columns="columns"
         :pagination="pagination"
         :data-source="dataSource"
-        :row-selection="rowSelection"
+        :row-selection="{selectedRowKeys: dataSelect, onChange: handleSelect}"
         :rowKey="record => record.index"
       >
         <template v-slot:source="{text}"><div v-html="text"></div></template>
@@ -71,11 +71,6 @@ export default {
         pageSizeOptions: ['10', '20', '50'],
         showTotal: total => `总共有 ${total} 条数据`,
         showSizeChange: (_, pageSize) => { this.pageSize = pageSize }
-      },
-      rowSelection: {
-        onChange: (selectedRowKeys, selectedRows) => {
-          this.dataSelect = selectedRowKeys
-        }
       }
     }
   },
@@ -108,7 +103,7 @@ export default {
         this.edges = data[1]
         const mappingKey = this.nodes.map(node => node.id)
         const mappingVal = this.nodes.map(node => node.name)
-        this.dataSelect = []
+        this.dataSelect = [] // clear
         this.dataOrigin = this.edges.map((edge, index) => ({
           index: index + 1,
           source: mappingVal[mappingKey.indexOf(edge.source)],
@@ -117,6 +112,9 @@ export default {
         }))
         this.loading = false
       })
+    },
+    handleSelect: function (selectedRowKeys) {
+      this.dataSelect = selectedRowKeys
     },
     format: function (data) {
       return String(data).replace(/"/g, '""').replace(/(^[\s\S]*$)/, '"$1"')
