@@ -46,25 +46,6 @@ export default {
       edges: [],
       dataSelect: [],
       dataOrigin: [],
-      columns: [{
-        title: '序号',
-        dataIndex: 'index',
-        key: 'index'
-      }, {
-        title: '主实体',
-        dataIndex: 'source',
-        key: 'source',
-        slots: { customRender: 'source' }
-      }, {
-        title: '关系',
-        dataIndex: 'relationship',
-        key: 'relationship'
-      }, {
-        title: '从实体',
-        dataIndex: 'target',
-        key: 'target',
-        slots: { customRender: 'target' }
-      }],
       pagination: {
         pageSize: 10,
         showSizeChanger: true,
@@ -75,6 +56,63 @@ export default {
     }
   },
   computed: {
+    columns: function () {
+      const sourceList = Array.from(new Set(this.dataOrigin.map(data => data.source)))
+      const targetList = Array.from(new Set(this.dataOrigin.map(data => data.target)))
+      const relationList = Array.from(new Set(this.dataOrigin.map(data => data.relationship)))
+      return [{
+        title: '序号',
+        dataIndex: 'index',
+        key: 'index'
+      }, {
+        title: '主实体',
+        dataIndex: 'source',
+        key: 'source',
+        slots: { customRender: 'source' },
+        sortDirections: ['ascend', 'descend'],
+        sorter: (recordA, recordB) => {
+          return recordA.source.localeCompare(recordB.source, 'zh')
+        },
+        filterMultiple: true,
+        filters: sourceList.map(source => {
+          return { text: source, value: source }
+        }),
+        onFilter: (value, record) => {
+          return record.source.indexOf(value) !== -1
+        }
+      }, {
+        title: '关系',
+        dataIndex: 'relationship',
+        key: 'relationship',
+        sortDirections: ['ascend', 'descend'],
+        sorter: (recordA, recordB) => {
+          return recordA.relationship.localeCompare(recordB.relationship, 'zh')
+        },
+        filterMultiple: true,
+        filters: relationList.map(relation => {
+          return { text: relation, value: relation }
+        }),
+        onFilter: (value, record) => {
+          return record.relationship.indexOf(value) !== -1
+        }
+      }, {
+        title: '从实体',
+        dataIndex: 'target',
+        key: 'target',
+        slots: { customRender: 'target' },
+        sortDirections: ['ascend', 'descend'],
+        sorter: (recordA, recordB) => {
+          return recordA.target.localeCompare(recordB.target, 'zh')
+        },
+        filterMultiple: true,
+        filters: targetList.map(target => {
+          return { text: target, value: target }
+        }),
+        onFilter: (value, record) => {
+          return record.target.indexOf(value) !== -1
+        }
+      }]
+    },
     dataSource: function () {
       const dataSource = JSON.parse(JSON.stringify(this.dataOrigin))
       dataSource.forEach(data => {
